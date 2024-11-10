@@ -2,7 +2,7 @@
 import { RouterView } from "vue-router";
 import useCore from "@/stores/core.pinia.js";
 import { storeToRefs } from "pinia";
-import { watch } from "vue";
+import { watch, onMounted } from "vue";
 import { message } from "ant-design-vue";
 
 const corePinia = useCore();
@@ -18,6 +18,12 @@ watch(toastContent, () => {
       return message.success(toastMessage);
     }
   }
+});
+onMounted(() => {
+  localStorage.setItem(
+    "access_token",
+    "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJodHRwOi8vMC4wLjAuMDo4MDgwL2FwaS92MSIsImlzcyI6Imh0dHA6Ly8wLjAuMC4wOjgwODAvIiwidXNlcm5hbWUiOiJhZG1pbiJ9.pcvBwM4eaA2F01U5fpXFEdcdPihpzeS6eS9MManczPk"
+  );
 });
 </script>
 
