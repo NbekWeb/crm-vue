@@ -176,27 +176,32 @@ const deleteItem = (i) => {
   } else {
     formState.value.items.splice(selectedItem.value, 1);
   }
-  saveEdit(1);
+  saveEdit(0);
 };
 
 const saveEdit = (type = 0) => {
   if (type == 0) {
-    incomeOne.value.items[selectedItem.value] = JSON.parse(
+    // incomeOne.value.items[selectedItem.value] = JSON.parse(
+    //   JSON.stringify(item.value)
+    // );
+    incomeOne.value.items = [...formState.value.items];
+  } else if (type == 1) {
+    formState.value.items[selectedItem.value] = JSON.parse(
       JSON.stringify(item.value)
     );
-  } else if (type == 1) {
-    incomeOne.value.items = [...formState.value.items];
   } else if (type == 2) {
-    incomeOne.value.items.push({
+    formState.value.items.push({
       ...itemAdd.value,
-      orderNo:
-        incomeOne.value.items[incomeOne.value.items.length - 1].orderNo + 1,
+      orderNo: formState.value.items?.[incomeOne.value.items.length - 1]
+        ?.orderNo
+        ? formState.value.items[incomeOne.value.items.length - 1].orderNo + 1
+        : 1,
     });
     closeAddModal();
   }
 
   const { id, contract, counterparty, store, ...incomeWithoutId } =
-    incomeOne.value;
+    formState.value;
   incomePinia.editIncome(
     {
       ...incomeWithoutId,
@@ -328,7 +333,7 @@ onMounted(() => {
       </a-form>
       <template #footer>
         <a-button @click="closeEdit">Отменить</a-button>
-        <a-button type="primary" @click="saveEdit">Сохранит</a-button>
+        <a-button type="primary" @click="saveEdit(1)">Сохранит</a-button>
       </template>
     </a-modal>
     <a-modal v-model:open="open" title="Приходные документы">

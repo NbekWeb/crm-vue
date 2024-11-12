@@ -63,7 +63,7 @@ const titles = {
   incoming: "Приход",
   incomingOne: "Приход",
   incomingNew: "Приход добавить",
-  editIncoming: "Приход edit",
+  editIncoming: "Приход редактировать",
 };
 router.beforeEach((to, from, next) => {
   const accessToken = localStorage.getItem("access_token");
