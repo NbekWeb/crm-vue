@@ -14,6 +14,10 @@ const goOne = (id) => {
   router.push({ name: "incomingOne", query: { id } });
 };
 
+const goEdit = (id) => {
+  router.push({ name: "editIncoming", query: { id } });
+};
+
 function formatDate(date) {
   return dayjs(date).format(" DD-MM-YYYY");
 }
@@ -108,9 +112,9 @@ const columns = [
   },
 ];
 
-const createNew=()=>{
-  router.push({name:'incomingNew'})
-}
+const createNew = () => {
+  router.push({ name: "incomingNew" });
+};
 onMounted(() => {
   incomePinia.getIncome();
   getDependis();
@@ -139,7 +143,7 @@ onMounted(() => {
           :data-source="income"
           :pagination="false"
           bordered
-          :scroll="{ y: 'calc(100vh - 300px)', x:900  }"
+          :scroll="{ y: 'calc(100vh - 300px)', x: 900 }"
         >
           <template #bodyCell="{ column, index, text }">
             <template v-if="column.dataIndex === 'num'">

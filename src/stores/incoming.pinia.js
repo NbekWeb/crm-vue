@@ -9,6 +9,7 @@ const useIncome = defineStore("income", {
     product: [],
     counterparty: [],
     incomeOne: {},
+    products: {},
     counterparty: [],
     contract: [],
   }),
@@ -185,7 +186,7 @@ const useIncome = defineStore("income", {
           core.loadingUrl.delete("income/id");
         });
     },
-    getProductId(id, i) {
+    getProductId(id) {
       const core = useCore();
       core.loadingUrl.add("product/id");
       api({
@@ -193,7 +194,8 @@ const useIncome = defineStore("income", {
         method: "GET",
       })
         .then(({ data }) => {
-          this.incomeOne.items[i].product = data.success.name;
+          this.products[id] = data.success.name;
+          // this.incomeOne.items[i].product = data.success.name;
         })
         .catch((error) => {
           console.log(error);
@@ -272,7 +274,7 @@ const useIncome = defineStore("income", {
     },
     createIncome(data, callback) {
       const core = useCore();
-      core.loadingUrl.add("contract");
+      core.loadingUrl.add("createIncom");
       api({
         url: `incoming`,
         method: "POST",
@@ -285,7 +287,25 @@ const useIncome = defineStore("income", {
           console.log(error);
         })
         .finally(() => {
-          core.loadingUrl.delete("product");
+          core.loadingUrl.delete("createIncom");
+        });
+    },
+    editIncome(data, id, callback) {
+      const core = useCore();
+      core.loadingUrl.add("createIncom");
+      api({
+        url: `incoming/${id}`,
+        method: "PUT",
+        data,
+      })
+        .then(() => {
+          callback();
+        })
+        .catch((error) => {
+          console.log(error);
+        })
+        .finally(() => {
+          core.loadingUrl.delete("createIncom");
         });
     },
   },

@@ -6,6 +6,7 @@ import Outcoming from "../views/Outcoming.vue";
 import IncomingOne from "../views/IncomingOne.vue";
 import IncomingNew from "../views/IncomingNew.vue";
 import Incoming from "../views/Incoming.vue";
+import IncomingEdit from "@/views/IncomingEdit.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -45,6 +46,11 @@ const router = createRouter({
           name: "incomingNew",
           component: IncomingNew,
         },
+        {
+          path: "edit-incoming",
+          name: "editIncoming",
+          component: IncomingEdit,
+        }
       ],
     },
    
@@ -57,6 +63,7 @@ const titles = {
   incoming: "Приход",
   incomingOne: "Приход",
   incomingNew: "Приход добавить",
+  editIncoming: "Приход edit",
 };
 router.beforeEach((to, from, next) => {
   const accessToken = localStorage.getItem("access_token");

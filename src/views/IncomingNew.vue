@@ -118,17 +118,25 @@ onMounted(() => {
 const close = () => {
   openModal();
 };
+function onInputNumber(event) {
+  event.target.value = event.target.value.replace(/\D/g, '');
+
+  formState.value.code = event.target.value;
+}
 
 const addingItem = () => {
   formRef.value.validate().then(() => {
-    formState.items.push({ ...item.value });
+    formState.items.push({
+      ...item.value,
+      orderNo: formState.items.length + 1,
+    });
     close();
   });
 };
 
 const save = () => {
   mainRef.value.validate().then(() => {
-    incomePinia.createIncome({...formState},() => {
+    incomePinia.createIncome({ ...formState }, () => {
       goBack();
     });
   });
@@ -219,7 +227,7 @@ const save = () => {
       <template #footer>
         <div class="">
           <a-button @click="close">Отмена</a-button>
-          <a-button type="primary" @click="addingItem">Добавит</a-button>
+          <a-button type="primary" @click="addingItem">Добавить </a-button>
         </div>
       </template>
     </a-modal>
@@ -260,7 +268,11 @@ const save = () => {
         class="w-[200px]"
         :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
       >
-        <a-input v-model:value="formState.code" placeholder="Номер" />
+        <a-input
+          v-model:value="formState.code"
+          placeholder="Номер"
+          @keyup="onInputNumber"
+        />
       </a-form-item>
       <a-form-item
         class="w-[200px]"
@@ -346,7 +358,7 @@ const save = () => {
       </a-form-item>
     </a-form>
     <div class="flex justify-center w-full max-w-[1200px] mt-4">
-      <a-button type="primary" @click="save">Сохранит</a-button>
+      <a-button type="primary" @click="save">Сохранить</a-button>
     </div>
     <div class="pb-10 mt-4" v-if="formState.items.length">
       <h2 class="mb-0 text-2xl font-semibold">Товары</h2>

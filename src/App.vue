@@ -19,7 +19,6 @@ watch(toastContent, () => {
     }
   }
 });
-
 </script>
 
 <template>

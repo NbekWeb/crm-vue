@@ -12,7 +12,7 @@ const open = ref(false);
 const incomePinia = useIncome();
 
 const { loadingUrl } = storeToRefs(core);
-const { incomeOne } = storeToRefs(incomePinia);
+const { incomeOne, products } = storeToRefs(incomePinia);
 const route = useRoute();
 const router = useRouter();
 
@@ -27,8 +27,7 @@ const getDependis = () => {
 
 const getProductName = () => {
   for (let i = 0; i < incomeOne.value.items.length; i++) {
-    console.log(incomeOne.value.items[i].productId);
-    incomePinia.getProductId(incomeOne.value.items[i].productId, i);
+    incomePinia.getProductId(incomeOne.value.items[i].productId);
   }
 };
 
@@ -51,8 +50,8 @@ const columns = [
   },
   {
     title: "Товар",
-    dataIndex: "product",
-    key: "product",
+    dataIndex: "productId",
+    key: "productId",
     width: 120,
   },
   {
@@ -161,13 +160,16 @@ onMounted(() => {
             bordered
             :scroll="{ x: 800 }"
           >
-            <template #bodyCell="{ column, index }">
+            <template #bodyCell="{ column, index, text }">
               <template v-if="column.dataIndex === 'num'">
                 <span
                   class="hover:cursor-pointer"
                   @click="goOne(income[index].id)"
                   >{{ index + 1 }}</span
                 >
+              </template>
+              <template v-if="column.dataIndex === 'productId'">
+                <span class="hover:cursor-pointer">{{ products[text] }}</span>
               </template>
             </template>
           </a-table>
