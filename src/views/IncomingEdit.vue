@@ -8,11 +8,16 @@ import dayjs from "dayjs";
 import locale from "ant-design-vue/es/date-picker/locale/ru_RU";
 import "dayjs/locale/ru";
 import IconChevron from "@/components/icons/IconChevron.vue";
+import IconDelete from "@/components/icons/IconDelete.vue";
+import IconEdit from "@/components/icons/IconEdit.vue";
 
 dayjs.locale("ru");
 
+const itemAdd = ref({});
 const core = useCore();
 const open = ref(false);
+const openAdd = ref(false);
+const deleted = ref(false);
 const editProduct = ref(false);
 const incomePinia = useIncome();
 
@@ -92,6 +97,13 @@ const columns = [
     key: "cost",
     width: 120,
   },
+  {
+    title: "Редакт ",
+    dataIndex: "edit",
+    key: "edit",
+    width: 120,
+    fixed: "right",
+  },
 ];
 const currency = [
   {
@@ -126,7 +138,7 @@ const goBack = () => {
 const formState = ref({});
 const openModal = () => {
   open.value = !open.value;
-  formState.value = JSON.parse(JSON.stringify(incomeOne.value));
+  formState.value = JSON.parse(JSON.stringify({ ...incomeOne.value }));
   formState.value.date = formatDate(formState.value.date);
 };
 
@@ -157,16 +169,43 @@ const cancel = () => {
 const closeEdit = () => {
   editProduct.value = false;
 };
+const deleteItem = (i) => {
+  selectedItem.value = i;
+  if (formState.value.items.length == 0 || formState.value.items.length == 1) {
+    formState.value.items = [];
+  } else {
+    formState.value.items.splice(selectedItem.value, 1);
+  }
+  saveEdit(1);
+};
 
-const saveEdit = () => {
-  incomeOne.value.items[selectedItem.value] = JSON.parse(
-    JSON.stringify(item.value)
-  );
+const saveEdit = (type = 0) => {
+  if (type == 0) {
+    incomeOne.value.items[selectedItem.value] = JSON.parse(
+      JSON.stringify(item.value)
+    );
+  } else if (type == 1) {
+    incomeOne.value.items = [...formState.value.items];
+  } else if (type == 2) {
+    incomeOne.value.items.push({
+      ...itemAdd.value,
+      orderNo:
+        incomeOne.value.items[incomeOne.value.items.length - 1].orderNo + 1,
+    });
+    closeAddModal();
+  }
 
   const { id, contract, counterparty, store, ...incomeWithoutId } =
     incomeOne.value;
   incomePinia.editIncome(
-    { ...incomeWithoutId, date: formatDate(incomeWithoutId.date) },
+    {
+      ...incomeWithoutId,
+      date: formatDate(incomeWithoutId.date),
+      code:
+        incomeOne.value.code.trim().length == incomeOne.value.code.length
+          ? incomeOne.value.code + " "
+          : incomeOne.value.code.trim(),
+    },
     id,
     () => {
       incomePinia.getIncomeOne(route.query.id, () => {
@@ -176,10 +215,26 @@ const saveEdit = () => {
         incomePinia.getAllCounterparty();
         incomePinia.getAllStore();
         incomePinia.getAllProduct();
+        formState.value = JSON.parse(JSON.stringify({ ...incomeOne.value }));
+        formState.value.date = formatDate(formState.value.date);
       });
     }
   );
   closeEdit();
+};
+
+const cancelDelete = () => {
+  formState.value = JSON.parse(JSON.stringify({ ...incomeOne.value }));
+  formState.value.date = formatDate(formState.value.date);
+};
+
+const addingItem = () => {
+  openAdd.value = true;
+  itemAdd.value = {};
+};
+
+const closeAddModal = () => {
+  openAdd.value = false;
 };
 
 onMounted(() => {
@@ -191,14 +246,14 @@ onMounted(() => {
     incomePinia.getAllStore();
     incomePinia.getAllProduct();
 
-    formState.value = JSON.parse(JSON.stringify(incomeOne.value));
+    formState.value = JSON.parse(JSON.stringify({ ...incomeOne.value }));
     formState.value.date = formatDate(formState.value.date);
   });
 });
 </script>
 <template>
   <div>
-      <a-modal v-model:open="editProduct" title="Приходные документы">
+    <a-modal v-model:open="editProduct" title="Приходные документы">
       <a-form :model="item" class="pr-5 mt-4">
         <a-form-item
           label="OEM"
@@ -302,7 +357,7 @@ onMounted(() => {
           class="w-[200px]"
           :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
         >
-          <a-input v-model:value="incomeOne.code" placeholder="Номер" />
+          <a-input v-model:value="formState.code" placeholder="Номер" />
         </a-form-item>
         <a-form-item
           class="w-[200px]"
@@ -388,8 +443,93 @@ onMounted(() => {
         </a-form-item>
       </a-form>
       <template #footer>
-        <a-button @click="cancel">Отменить</a-button>
+        <a-button @click="cancelDelete">Отменить</a-button>
         <a-button type="primary" @click="save">Сохранит</a-button>
+      </template>
+    </a-modal>
+    <a-modal v-model:open="openAdd" title="Товар">
+      <div class="overflow-y-auto max-modal">
+        <a-form :model="itemAdd" class="pr-5 mt-4" ref="formRef">
+          <a-form-item
+            label="OEM"
+            name="oemCode"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-input
+              placeholder="OEM"
+              v-model:value="itemAdd.oemCode"
+            ></a-input>
+          </a-form-item>
+          <a-form-item
+            label="Товар"
+            name="productId"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-select v-model:value="itemAdd.productId">
+              <a-select-option
+                :value="item.id"
+                v-for="item of product"
+                :key="item.id"
+              >
+                {{ item.name }}
+              </a-select-option></a-select
+            >
+          </a-form-item>
+          <a-form-item
+            label="Кол-во"
+            name="quantity"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-input
+              placeholder="Кол-во"
+              v-model:value="itemAdd.quantity"
+              type="number"
+              :min="1"
+            ></a-input>
+          </a-form-item>
+          <a-form-item
+            label="Цена"
+            name="price"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-input
+              placeholder="Цена"
+              v-model:value="itemAdd.price"
+              type="number"
+              :min="1"
+            ></a-input>
+          </a-form-item>
+          <a-form-item
+            label="Вес"
+            name="weight"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-input
+              placeholder="Стоимость"
+              v-model:value="itemAdd.weight"
+              type="number"
+              :min="1"
+            ></a-input>
+          </a-form-item>
+          <a-form-item
+            label="Стоимость"
+            name="cost"
+            :rules="[{ required: true, message: 'Пожалуйста, введите!' }]"
+          >
+            <a-input
+              placeholder="Стоимость"
+              v-model:value="itemAdd.cost"
+              type="number"
+              :min="1"
+            ></a-input>
+          </a-form-item>
+        </a-form>
+      </div>
+      <template #footer>
+        <div class="">
+          <a-button @click="closeAddModal">Отмена</a-button>
+          <a-button type="primary" @click="saveEdit(2)">Добавить </a-button>
+        </div>
       </template>
     </a-modal>
     <a-spin :spinning="loadingUrl.has('income/one')">
@@ -404,30 +544,55 @@ onMounted(() => {
             </span>
             <h2 class="mb-0 text-2xl font-semibold">Приход</h2>
           </div>
-          <a-button type="primary" @click="openModal">Документ</a-button>
+          <div class="flex items-center gap-4">
+            <a-button @click="openModal">Редактировать</a-button>
+            <a-button type="primary" @click="addingItem">Добавить </a-button>
+          </div>
         </div>
-
         <div class="">
           <a-table
             :columns="columns"
             :data-source="formState.items"
             :pagination="false"
             bordered
-            :scroll="{ x: 800 }"
+            :scroll="{ x: 800, y: 'calc(100vh - 400px)' }"
           >
             <template #bodyCell="{ column, index, text }">
               <template v-if="column.dataIndex === 'num'">
-                <span
-                  class="hover:cursor-pointer"
-                  @click="openProduct(index)"
-                  >{{ index + 1 }}</span
-                >
+                <span class="hover:cursor-pointer">{{ index + 1 }}</span>
               </template>
               <template v-if="column.dataIndex === 'productId'">
                 <span class="hover:cursor-pointer">{{ products[text] }}</span>
               </template>
+              <template v-if="column.dataIndex === 'edit'">
+                <div class="flex items-center gap-2">
+                  <a-popover title="Изменить">
+                    <template #content> </template>
+                    <div
+                      @click="openProduct(index)"
+                      class="w-6 h-6 min-w-6 rounded-full bg-gray-500 flex justify-center items-center text-[10px]"
+                    >
+                      <icon-edit />
+                    </div>
+                  </a-popover>
+                  <a-popover title="Удалить">
+                    <template #content> </template>
+                    <div
+                      @click="deleteItem(index)"
+                      class="flex items-center justify-center w-6 h-6 text-sm bg-gray-500 rounded-full min-w-6"
+                    >
+                      <!-- @click="saveEdit(1, index)" -->
+                      <icon-delete />
+                    </div>
+                  </a-popover>
+                </div>
+              </template>
             </template>
           </a-table>
+          <!-- <div class="flex justify-center w-full gap-5 pt-4" v-if="deleted">
+            <a-button @click="cancelDelete">Отменить</a-button>
+            <a-button type="primary">Сохранит</a-button>
+          </div> -->
         </div>
       </div>
     </a-spin>

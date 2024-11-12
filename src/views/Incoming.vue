@@ -208,6 +208,7 @@ onMounted(() => {
                 <a-popover title="Изменить">
                   <template #content> </template>
                   <div
+                  @click="goEdit(income[index].id )"
                     class="w-6 h-6 min-w-6 rounded-full bg-gray-500 flex justify-center items-center text-[10px]"
                   >
                     <icon-edit />

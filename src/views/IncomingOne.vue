@@ -9,6 +9,7 @@ import IconChevron from "@/components/icons/IconChevron.vue";
 
 const core = useCore();
 const open = ref(false);
+
 const incomePinia = useIncome();
 
 const { loadingUrl } = storeToRefs(core);
@@ -173,6 +174,7 @@ onMounted(() => {
               </template>
             </template>
           </a-table>
+          
         </div>
       </div>
     </a-spin>
