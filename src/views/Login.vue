@@ -18,7 +18,7 @@ const submitLogin = () => {
     () => {
       formState.username = "";
       formState.password = "";
-      router.push({ name: "Tasks" });
+      router.push({ name: "Main" });
     }
   );
 };

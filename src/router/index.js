@@ -1,5 +1,6 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Login from "../views/Login.vue";
+import Dashboard from "../views/Dashboard.vue";
 import Main from "../views/Main.vue";
 import Tasks from "../views/Tasks.vue";
 import Outcoming from "../views/Outcoming.vue";
@@ -7,6 +8,8 @@ import IncomingOne from "../views/IncomingOne.vue";
 import IncomingNew from "../views/IncomingNew.vue";
 import Incoming from "../views/Incoming.vue";
 import IncomingEdit from "@/views/IncomingEdit.vue";
+import Vendor from "@/views/Vendor.vue";
+import Action from "@/views/Action.vue";
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -17,9 +20,14 @@ const router = createRouter({
       component: Login,
     },
     {
-      path: "",
+      path: "/",
       name: "Main",
       component: Main,
+    },
+    {
+      path: "/dashboard",
+      name: "Dashboard",
+      component: Dashboard,
       children: [
         {
           path: "",
@@ -50,10 +58,19 @@ const router = createRouter({
           path: "edit-incoming",
           name: "editIncoming",
           component: IncomingEdit,
-        }
+        },
+        {
+          path: "vendor",
+          name: "vendor",
+          component: Vendor,
+        },
+        {
+          path: "action",
+          name: "action",
+          component: Action,
+        },
       ],
     },
-   
   ],
 });
 const titles = {
@@ -64,6 +81,9 @@ const titles = {
   incomingOne: "Приход",
   incomingNew: "Приход добавить",
   editIncoming: "Приход редактировать",
+  Main: "Главной",
+  vendor: "Продавец",
+  action: "Перемещения",
 };
 router.beforeEach((to, from, next) => {
   const accessToken = localStorage.getItem("access_token");

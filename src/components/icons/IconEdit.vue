@@ -12,10 +12,6 @@
         fill="white"
       />
     </g>
-    <defs>
-      <clipPath id="clip0_487_167">
-        <rect width="1em" height="1em" fill="white" />
-      </clipPath>
-    </defs>
+   
   </svg>
 </template>
